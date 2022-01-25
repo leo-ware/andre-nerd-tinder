@@ -1,4 +1,4 @@
-from make_clusters import *
+from src.make_clusters import *
 import numpy as np
 
 def test_load_papers():

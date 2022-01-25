@@ -3,6 +3,8 @@ import numpy as np
 import spacy
 from sklearn.cluster import KMeans
 
+from src.paper_lookup import paper_lookup
+
 nlp = spacy.load("en_core_web_sm")
 
 def embed_title(title):
@@ -10,10 +12,14 @@ def embed_title(title):
 
 def load_papers(query, max_results=100):
     url = 'https://api.semanticscholar.org/graph/v1/paper/search'
-    params = {'query': query, 'limit': max_results}
+    params = {'query': query, 'limit': max_results, 'fields': 'paperId,title,abstract,authors'}
     r = requests.get(url, params=params)
+
     if r.status_code == 200:
-        return r.json()["data"]
+        data = r.json()["data"]
+        cache_vals = {p['paperId']: p for p in data}
+        paper_lookup.save(cache_vals)
+        return data
     else:
         raise Exception('Error: {}'.format(r.status_code))
 
